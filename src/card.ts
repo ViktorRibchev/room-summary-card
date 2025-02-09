@@ -25,6 +25,7 @@ import {
 import { getCardStyles, getEntityIconStyles, styles } from './styles';
 import type { Config, EntityInformation } from './types/config';
 import type { HomeAssistant } from './types/homeassistant';
+
 const equal = require('fast-deep-equal');
 
 export class RoomSummaryCard extends LitElement {
@@ -88,6 +89,11 @@ export class RoomSummaryCard extends LitElement {
       this._roomEntity.state,
     );
 
+    // Use the provided label from _config if available; otherwise, fall back to the formatted area name.
+    const areaName = (this._config && this._config.label)
+      ? this._config.label
+      : this._formatAreaName();
+
     return html`
       <div class="card" style="${cardStyle}">
         <div class="grid">
@@ -98,7 +104,7 @@ export class RoomSummaryCard extends LitElement {
             @action=${handleClickAction(this, this._roomEntity)}
             .actionHandler=${actionHandler(this._roomEntity)}
           >
-            ${this._formatAreaName()}
+            ${areaName}
           </div>
 
           <!-- Climate Information -->
@@ -193,10 +199,14 @@ export class RoomSummaryCard extends LitElement {
   private _getLabel(): string {
     if (!this._hass || !this._config.area) return '';
 
-    const temp = getState(this._hass, this._config.temperature_sensor)?.state;
+    // Get the temperature sensor state (as a string)
+    const sensorTemp = getState(this._hass, this._config.temperature_sensor)?.state;
     const humidity = getState(this._hass, this._config.humidity_sensor)?.state;
 
-    return `${temp}°F - ${humidity}%`;
+    // Use the configured unit or default to 'C' (for Celsius)
+    const unit = (this._config.unit || 'C').toUpperCase();
+
+    return `${sensorTemp}°${unit} - ${humidity}%`;
   }
 
   /**

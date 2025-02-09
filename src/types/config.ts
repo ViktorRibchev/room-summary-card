@@ -11,6 +11,10 @@ import type { State } from "./homeassistant";
 export interface Config {
   /** The area identifier where the entity is located */
   area: string;
+  /** The area label */
+  label: string;
+  /** Optional temperature unit: use 'C' for Celsius or 'F' for Fahrenheit (default is 'C') */
+  unit?: string;
   /** Single entity configuration or entity ID */
   entity?: EntityConfig | string;
   /** Array of entity configurations or entity IDs */
@@ -28,6 +32,7 @@ export interface Config {
   /** Entity ID for temperature sensor */
   temperature_sensor?: string;
 }
+
 
 /**
  * Configuration for an individual entity including display and interaction options.
